@@ -37,8 +37,8 @@ app.post('/webhook/', function (req, res) {
       		messenger.sendTextMessage(sender, text + " pra você também!");
     	}
       else if (event.postback) {
-        var info = event.postback;
-        console.log(info);
+        var info = JSON.parse(event.postback.payload);
+        console.log(info.type, info.key);
 
         text = JSON.stringify(event.postback);
         messenger.sendTextMessage(sender, "Postback received: "+text.substring(0, 200));
