@@ -26,7 +26,7 @@ app.post('/webhook/', function (req, res) {
       		text = event.message.text;
 
           if (text === 'Generic') {
-            sendGenericMessage(sender);
+            messenger.sendGenericMessage(sender);
             continue;
           }
 
