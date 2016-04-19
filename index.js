@@ -23,25 +23,37 @@ app.post('/webhook/', function (req, res) {
     	event = req.body.entry[0].messaging[i];
     	sender = event.sender.id;
 
-      console.log('event.postback', event.postback);
-      console.log('event.message', event.message);
-
     	if (event.message && event.message.text) {
       		text = event.message.text;
+          text = encodeURIComponent(text.trim());
 
-          if (text === 'Generic') {
-            messenger.sendGenericMessage(sender);
-            continue;
-          }
+          request({
+            url: "http://ec2-54-226-237-234.compute-1.amazonaws.com/say",
+            qs: { term: text },
+            method: 'GET',
+          }, function(error, response, body) {
+            if (error) {
+              console.log('Error saying: ', error);
+            }
+            else if (response.body.error) {
+              console.log('Error saying: ', response.body.error);
+            }
+            console.log(response);
+          });
+
+          // if (text === 'Generic') {
+          //   messenger.sendGenericMessage(sender);
+          //   continue;
+          // }
 
       		messenger.sendTextMessage(sender, text + " pra você também!");
     	}
       else if (event.postback) {
-        var info = JSON.parse(event.postback.payload);
-        console.log(info.type, info.key);
+        // var info = JSON.parse(event.postback.payload);
+        // console.log(info.type, info.key);
 
-        text = JSON.stringify(event.postback);
-        messenger.sendTextMessage(sender, "Postback received: "+text.substring(0, 200));
+        // text = JSON.stringify(event.postback);
+        // messenger.sendTextMessage(sender, "Postback received: "+text.substring(0, 200));
         continue;
       }
   	}
