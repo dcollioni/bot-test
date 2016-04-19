@@ -34,19 +34,25 @@ app.post('/webhook/', function (req, res) {
           }, function(error, response, body) {
             if (error) {
               console.log('Error saying: ', error);
+              return;
             }
             else if (response.body.error) {
               console.log('Error saying: ', response.body.error);
+              return;
             }
-            console.log(response.body);
+
+            if (response.body) {
+              console.log(body.length);
+            }
+
+
+            messenger.sendTextMessage(sender, text + " pra você também!");
           });
 
           // if (text === 'Generic') {
           //   messenger.sendGenericMessage(sender);
           //   continue;
           // }
-
-      		messenger.sendTextMessage(sender, text + " pra você também!");
     	}
       else if (event.postback) {
         // var info = JSON.parse(event.postback.payload);
