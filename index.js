@@ -58,7 +58,7 @@ app.post('/webhook/', function (req, res) {
                 return {
                   "title": entity.value.name,
                   "subtitle": entity.value.description,
-                  "image_url": entity.value.art,
+                  "image_url": entity.value.arts ? entity.value.arts["2x1"] || entity.value.arts["2x2"] : null,
                   "buttons": [{
                     "type": "web_url",
                     "url": "http://superplayer.fm/player?playing=" + entity.value.key,
