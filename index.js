@@ -59,7 +59,7 @@ app.post('/webhook/', function (req, res) {
               console.log(msgs);
 
               var textMsgs = _.filter(msgs, function(m) { return m.type === 'text'; });
-              var entityList = _.filter(msgs, function(m) { return m.type === 'entity-list'; });
+              var entityList = _.find(msgs, function(m) { return m.type === 'entity-list'; });
 
               for (var j = 0; j < textMsgs.length; j++) {
                 var msg = textMsgs[j];
