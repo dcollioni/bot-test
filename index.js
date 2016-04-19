@@ -25,6 +25,8 @@ app.post('/webhook/', function (req, res) {
     	event = req.body.entry[0].messaging[i];
     	sender = event.sender.id;
 
+      console.log('event.sender', event.sender);
+
     	if (event.message && event.message.text) {
       		text = event.message.text;
           text = encodeURIComponent(text.trim());
@@ -58,7 +60,9 @@ app.post('/webhook/', function (req, res) {
                 return {
                   "title": entity.value.name,
                   "subtitle": entity.value.description,
-                  "image_url": entity.value.arts ? entity.value.arts["2x1"] || entity.value.arts["2x2"] : null,
+                  "image_url": entity.value.arts ?
+                    entity.value.arts["2x1"] || entity.value.arts["2x2"]
+                    : null,
                   "buttons": [{
                     "type": "web_url",
                     "url": "http://superplayer.fm/player?playing=" + entity.value.key,
@@ -71,13 +75,7 @@ app.post('/webhook/', function (req, res) {
                 messenger.sendCardMessages(sender, elements);
               }
             }
-            // messenger.sendTextMessage(sender, text + " pra você também!");
           });
-
-          // if (text === 'Generic') {
-          //   messenger.sendGenericMessage(sender);
-          //   continue;
-          // }
     	}
       else if (event.postback) {
         // var info = JSON.parse(event.postback.payload);
