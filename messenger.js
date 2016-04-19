@@ -27,7 +27,7 @@ class Messenger {
   }
 
   sendGenericMessage(sender) {
-    messageData = {
+    var messageData = {
       "attachment": {
         "type": "template",
         "payload": {
