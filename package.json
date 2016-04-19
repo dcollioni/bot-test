@@ -1,0 +1,26 @@
+{
+  "name": "bot-test",
+  "version": "1.0.0",
+  "description": "messenger bot test app",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dcollioni/bot-test.git"
+  },
+  "keywords": [
+    "messenger",
+    "bot"
+  ],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dcollioni/bot-test/issues"
+  },
+  "homepage": "https://github.com/dcollioni/bot-test#readme",
+  "dependencies": {
+    "express": "^4.13.4"
+  }
+}
