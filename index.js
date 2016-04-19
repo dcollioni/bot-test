@@ -5,6 +5,8 @@ var request = require("request");
 var _ = require("underscore");
 var app = express();
 
+var token = "CAAHp6HIb7KwBAC0zjikZBaZBQ9XlctZCvbyxhpfms4fRwNw3BSLa5wpNyXubacndbZBW4wM8RuM6bQTCgtMHxs0sIvzFVhSlrVwgdkXvonDZC1Bh27EwSZBc7qeIE6HAvmqoiiKHk1wSYGNRoYipnzZBDChZCLDtDrk2GidihioWjFBKhe9BxLZAyoWpOGejrdXZCWU1aZBWNIZBEAZDZD";
+
 app.use(bodyParser.json());
 app.set('port', (process.env.PORT || 5000));
 
@@ -25,7 +27,14 @@ app.post('/webhook/', function (req, res) {
     	event = req.body.entry[0].messaging[i];
     	sender = event.sender.id;
 
-      console.log('event.sender', event.sender);
+      request({
+        url: "https://graph.facebook.com/v2.6/" + sender + "?fields=first_name,last_name,profile_pic&access_token=" + token,
+        method: "GET"
+      }, function (error, response, body) {
+        var user = JSON.parse(body);
+        console.log(user.first_name);
+        console.log(user.last_name);
+      });
 
     	if (event.message && event.message.text) {
       		text = event.message.text;
