@@ -29,8 +29,7 @@ app.post('/webhook/', function (req, res) {
           text = encodeURIComponent(text.trim());
 
           request({
-            url: "http://ec2-54-226-237-234.compute-1.amazonaws.com/say",
-            qs: { term: text },
+            url: "http://ec2-54-226-237-234.compute-1.amazonaws.com/say/" + text,
             method: 'GET',
           }, function(error, response, body) {
             if (error) {
