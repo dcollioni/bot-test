@@ -11,11 +11,12 @@ class Messenger {
     };
     request({
       url: 'https://graph.facebook.com/v2.6/me/messages',
-      qs: {access_token:token},
+      qs: { access_token: token },
       method: 'POST',
       json: {
         recipient: {id:sender},
-        message: messageData,
+        //message: messageData,
+        messages: ['Bundinha', 'Ops... bom dia!', 'Maldito correto... hehehe'],
       }
     }, function(error, response, body) {
       if (error) {
