@@ -39,7 +39,7 @@ app.post('/webhook/', function (req, res) {
             else if (response.body.error) {
               console.log('Error saying: ', response.body.error);
             }
-            console.log(response);
+            console.log(response.body);
           });
 
           // if (text === 'Generic') {
