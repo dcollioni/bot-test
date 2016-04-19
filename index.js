@@ -42,11 +42,16 @@ app.post('/webhook/', function (req, res) {
             }
 
             if (response.body) {
-              console.log(body.length);
+              var msgs = JSON.parse(response.body);
+              for (var j = 0; j < msgs.length; j++) {
+                var msg = msgs[j];
+                if (msg.type === 'text') {
+                  messenger.sendTextMessage(sender, msg.value);
+                }
+                console.log(msg);
+              }
             }
-
-
-            messenger.sendTextMessage(sender, text + " pra você também!");
+            // messenger.sendTextMessage(sender, text + " pra você também!");
           });
 
           // if (text === 'Generic') {
