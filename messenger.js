@@ -38,8 +38,8 @@ class Messenger {
             "image_url": "http://messengerdemo.parseapp.com/img/rift.png",
             "buttons": [{
               "type": "web_url",
-              "url": "https://www.messenger.com/",
-              "title": "Web url"
+              "url": "https://superplayer.fm/player?playing=para-programar",
+              "title": "Programando"
             }, {
               "type": "postback",
               "title": "Postback",
