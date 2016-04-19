@@ -59,7 +59,7 @@ app.post('/webhook/', function (req, res) {
               console.log(msgs);
 
               var textMsgs = _.filter(msgs, function(m) { return m.type === 'text'; });
-              var entityMsgs = _.filter(msgs, function(m) { return m.type === 'entity'; });
+              var entityList = _.filter(msgs, function(m) { return m.type === 'entity-list'; });
 
               for (var j = 0; j < textMsgs.length; j++) {
                 var msg = textMsgs[j];
@@ -68,25 +68,27 @@ app.post('/webhook/', function (req, res) {
                 //}, j * 1000);
               }
 
-              var elements = _.map(entityMsgs, function(entity) {
-                return {
-                  "title": entity.value.name,
-                  "subtitle": entity.value.description,
-                  "image_url": entity.value.arts ?
-                    entity.value.arts["2x1"] || entity.value.arts["2x2"]
-                    : null,
-                  "buttons": [{
-                    "type": "web_url",
-                    "url": "http://superplayer.fm/player?playing=" + entity.value.key,
-                    "title": "Ouvir"
-                  }]
-                };
-              });
+              if (entityList) {
+                var elements = _.map(entityList.value, function(entity) {
+                  return {
+                    "title": entity.value.name,
+                    "subtitle": entity.value.description,
+                    "image_url": entity.value.arts ?
+                      entity.value.arts["2x1"] || entity.value.arts["2x2"]
+                      : null,
+                    "buttons": [{
+                      "type": "web_url",
+                      "url": "http://superplayer.fm/player?playing=" + entity.value.key,
+                      "title": "Ouvir"
+                    }]
+                  };
+                });
 
-              if (elements.length > 0) {
-                //setTimeout(function() {
-                  messenger.sendCardMessages(sender, elements);
-                //}, textMsgs.length * 1000);
+                if (elements.length > 0) {
+                  //setTimeout(function() {
+                    messenger.sendCardMessages(sender, elements);
+                  //}, textMsgs.length * 1000);
+                }
               }
             }
           });
