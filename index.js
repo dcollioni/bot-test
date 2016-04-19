@@ -1,5 +1,6 @@
 var express = require('express');
 var bodyParser = require('body-parser');
+var messenger = require('./messenger.js');
 var app = express();
 
 app.use(bodyParser.json());
@@ -23,7 +24,7 @@ app.post('/webhook/', function (req, res) {
     	sender = event.sender.id;
     	if (event.message && event.message.text) {
       		text = event.message.text;
-      		console.log(text);
+      		messenger.sendTextMessage(sender, text + " pra você também!");
     	}
   	}
 	res.sendStatus(200);
