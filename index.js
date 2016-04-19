@@ -1,6 +1,8 @@
 var express = require('express');
+var bodyParser = require('body-parser');
 var app = express();
 
+app.use(bodyParser.json());
 app.set('port', (process.env.PORT || 5000));
 
 app.get('/', function(request, response) {
@@ -15,7 +17,7 @@ app.get('/webhook/', function (req, res) {
 });
 
 app.post('/webhook/', function (req, res) {
-  	console.log(req.body);
+  	console.log(req);
   	messaging_events = req.body.entry[0].messaging;
   	for (i = 0; i < messaging_events.length; i++) {
     	event = req.body.entry[0].messaging[i];
