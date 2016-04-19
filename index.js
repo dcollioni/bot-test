@@ -62,7 +62,9 @@ app.post('/webhook/', function (req, res) {
 
               for (var j = 0; j < textMsgs.length; j++) {
                 var msg = textMsgs[j];
-                messenger.sendTextMessage(sender, msg.value);
+                setTimeout(function() {
+                  messenger.sendTextMessage(sender, msg.value);
+                }, j * 1000);
               }
 
               var elements = _.map(entityMsgs, function(entity) {
@@ -81,7 +83,9 @@ app.post('/webhook/', function (req, res) {
               });
 
               if (elements.length > 0) {
-                messenger.sendCardMessages(sender, elements);
+                setTimeout(function() {
+                  messenger.sendCardMessages(sender, elements);
+                }, textMsgs.length * 1000);
               }
             }
           });

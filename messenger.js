@@ -15,8 +15,7 @@ class Messenger {
       method: 'POST',
       json: {
         recipient: {id:sender},
-        //message: messageData,
-        messages: ['Bundinha', 'Ops... bom dia!', 'Maldito correto... hehehe'],
+        message: messageData,
       }
     }, function(error, response, body) {
       if (error) {
