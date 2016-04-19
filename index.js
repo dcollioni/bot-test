@@ -70,6 +70,7 @@ app.post('/webhook/', function (req, res) {
 
               if (entityList) {
                 var elements = _.map(entityList.value, function(entity) {
+                  console.log(entity);
                   return {
                     "title": entity.value.name,
                     "subtitle": entity.value.description,
