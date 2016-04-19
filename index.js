@@ -29,7 +29,7 @@ function dispatch (sender, messages) {
   var msg = messages.shift();
   console.log(msg);
   messenger.sendTextMessage(sender, msg).then(function() {
-    dispatch(messages);
+    dispatch(sender, messages);
   });
 }
 
