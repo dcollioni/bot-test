@@ -43,7 +43,7 @@ class Messenger {
             }, {
               "type": "postback",
               "title": "Postback",
-              "payload": "Payload for first element in a generic bubble",
+              "payload": '{ "key": "para-programar", "type": "playlist" }',
             }],
           },{
             "title": "Second card",
