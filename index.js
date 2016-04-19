@@ -21,6 +21,16 @@ app.get('/webhook/', function (req, res) {
 	res.send('Error, wrong validation token');
 });
 
+function dispatch (sender, messages) {
+  if (!messages || messages.length == 0) {
+    return;
+  }
+  var msg = messages.shift();
+  messenger.sendTextMessage(sender, msg).then(function() {
+    dispatch(messages);
+  });
+}
+
 app.post('/webhook/', function (req, res) {
   	messaging_events = req.body.entry[0].messaging;
   	for (i = 0; i < messaging_events.length; i++) {
@@ -59,15 +69,10 @@ app.post('/webhook/', function (req, res) {
               console.log(msgs);
 
               var textMsgs = _.filter(msgs, function(m) { return m.type === 'text'; });
+              textMsgs = _.map(textMsgs, function(m) { return m.value });
+              dispatch(sender, textMsgs);
+
               var entityList = _.find(msgs, function(m) { return m.type === 'entity-list'; });
-
-              for (var j = 0; j < textMsgs.length; j++) {
-                var msg = textMsgs[j];
-                //setTimeout(function() {
-                  messenger.sendTextMessage(sender, msg.value);
-                //}, j * 1000);
-              }
-
               if (entityList) {
                 var elements = _.map(entityList.value, function(entity) {
                   console.log(entity);
