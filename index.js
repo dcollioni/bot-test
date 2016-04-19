@@ -2,6 +2,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var messenger = require('./messenger.js');
 var request = require("request");
+var _ = require("underscore");
 var app = express();
 
 app.use(bodyParser.json());
@@ -43,12 +44,31 @@ app.post('/webhook/', function (req, res) {
 
             if (response.body) {
               var msgs = JSON.parse(response.body);
-              for (var j = 0; j < msgs.length; j++) {
-                var msg = msgs[j];
-                if (msg.type === 'text') {
-                  messenger.sendTextMessage(sender, msg.value);
-                }
-                console.log(msg);
+              console.log(msgs);
+
+              var textMsgs = _.filter(msgs, function(m) { return m.type === 'text'; });
+              var entityMsgs = _.filter(msgs, function(m) { return m.type === 'entity'; });
+
+              for (var j = 0; j < textMsgs.length; j++) {
+                var msg = textMsgs[j];
+                messenger.sendTextMessage(sender, msg.value);
+              }
+
+              var elements = _.map(entityMsgs, function(entity) {
+                return {
+                  "title": entity.value.name,
+                  "subtitle": entity.value.description,
+                  "image_url": entity.value.art,
+                  "buttons": [{
+                    "type": "web_url",
+                    "url": "http://superplayer.fm/player?playing=" + entity.value.key,
+                    "title": "Ouvir"
+                  }]
+                };
+              });
+
+              if (elements.length > 0) {
+                messenger.sendCardMessages(sender, elements);
               }
             }
             // messenger.sendTextMessage(sender, text + " pra você também!");
