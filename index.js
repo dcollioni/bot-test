@@ -22,10 +22,12 @@ app.get('/webhook/', function (req, res) {
 });
 
 function dispatch (sender, messages) {
+  console.log(messages);
   if (!messages || messages.length == 0) {
     return;
   }
   var msg = messages.shift();
+  console.log(msg);
   messenger.sendTextMessage(sender, msg).then(function() {
     dispatch(messages);
   });
