@@ -24,6 +24,12 @@ app.post('/webhook/', function (req, res) {
     	sender = event.sender.id;
     	if (event.message && event.message.text) {
       		text = event.message.text;
+
+          if (text === 'Generic') {
+            sendGenericMessage(sender);
+            continue;
+          }
+
       		messenger.sendTextMessage(sender, text + " pra você também!");
     	}
   	}
