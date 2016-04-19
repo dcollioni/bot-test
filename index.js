@@ -27,21 +27,22 @@ app.post('/webhook/', function (req, res) {
     	event = req.body.entry[0].messaging[i];
     	sender = event.sender.id;
 
-      request({
-        url: "https://graph.facebook.com/v2.6/" + sender + "?fields=first_name,last_name,profile_pic&access_token=" + token,
-        method: "GET"
-      }, function (error, response, body) {
-        var user = JSON.parse(body);
-        console.log(user.first_name);
-        console.log(user.last_name);
-      });
+      // request({
+      //   url: "https://graph.facebook.com/v2.6/" + sender + "?fields=first_name,last_name,profile_pic&access_token=" + token,
+      //   method: "GET"
+      // }, function (error, response, body) {
+      //   var user = JSON.parse(body);
+      //   console.log(user.first_name);
+      //   console.log(user.last_name);
+      // });
 
     	if (event.message && event.message.text) {
       		text = event.message.text;
           text = encodeURIComponent(text.trim());
 
           request({
-            url: "http://ec2-54-226-237-234.compute-1.amazonaws.com/say/" + text,
+            url: "http://splchat-alpha.herokuapp.com/say/" + text,
+            qs: { limit_results: 10, support_entity_list: false },
             method: 'GET',
           }, function(error, response, body) {
             if (error) {
@@ -62,9 +63,9 @@ app.post('/webhook/', function (req, res) {
 
               for (var j = 0; j < textMsgs.length; j++) {
                 var msg = textMsgs[j];
-                setTimeout(function() {
+                //setTimeout(function() {
                   messenger.sendTextMessage(sender, msg.value);
-                }, j * 1000);
+                //}, j * 1000);
               }
 
               var elements = _.map(entityMsgs, function(entity) {
@@ -83,9 +84,9 @@ app.post('/webhook/', function (req, res) {
               });
 
               if (elements.length > 0) {
-                setTimeout(function() {
+                //setTimeout(function() {
                   messenger.sendCardMessages(sender, elements);
-                }, textMsgs.length * 1000);
+                //}, textMsgs.length * 1000);
               }
             }
           });
