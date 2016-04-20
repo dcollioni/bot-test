@@ -54,9 +54,15 @@ app.post('/webhook/', function (req, res) {
 
               var messagesToSend = _.filter(msgs, function(m) { return m.type === 'text'; });
 
+              var entities = _.filter(msgs, function(m) { return m.type === 'entity' });
               var entityList = _.find(msgs, function(m) { return m.type === 'entity-list'; });
+
               if (entityList) {
-                var elements = _.map(entityList.value, function(entity) {
+                entities = _.union(entityList.value, entities);
+              }
+
+              if (entities.length > 0) {
+                var elements = _.map(entities, function(entity) {
                   return {
                     "title": entity.value.name,
                     "subtitle": entity.value.description,
