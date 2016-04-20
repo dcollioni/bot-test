@@ -29,16 +29,7 @@ app.post('/webhook/', function (req, res) {
     	event = req.body.entry[0].messaging[i];
     	sender = event.sender.id;
 
-      // request({
-      //   url: "https://graph.facebook.com/v2.6/" + sender + "?fields=first_name,last_name,profile_pic&access_token=" + token,
-      //   method: "GET"
-      // }, function (error, response, body) {
-      //   var user = JSON.parse(body);
-      //   console.log(user.first_name);
-      //   console.log(user.last_name);
-      // });
-
-    	if (event.message && event.message.text) {
+      if (event.message && event.message.text) {
       		text = event.message.text;
           text = encodeURIComponent(text.trim());
 
@@ -112,8 +103,11 @@ function dispatch (sender, messages) {
   var msg = messages.shift();
   switch (msg.type) {
     case 'text':
-        var text = msg.value; // replaceMacros(user, msg.value);
-        messenger.sendTextMessage(sender, text).then(function() {
+        var text = replaceMacros(sender, msg.value).then(function(newText) {
+          messenger.sendTextMessage(sender, newText).then(function() {
+            dispatch(sender, messages);
+          });
+        }).fail(function() {
           dispatch(sender, messages);
         });
       break;
@@ -130,33 +124,52 @@ function dispatch (sender, messages) {
   }
 }
 
-function replaceMacros(user, text) {
-    var regex = /\[#[^\]]*\]/gi;
-    var regexRemoveTerm = /[,\s]+?\[#[^\]]*\]/gi;
-    var terms = [];
-    var x;
+function replaceMacros(userId, text) {
+  var deferred = Promise.defer();
 
-    while ((x = regex.exec(text)) !== null)
-        terms.push(x[0]);
+  var regex = /\[#[^\]]*\]/gi;
+  var regexRemoveTerm = /[,\s]+?\[#[^\]]*\]/gi;
+  var terms = [];
+  var x;
 
-    terms.forEach(function(term) {
-        var value;
+  while ((x = regex.exec(text)) !== null) {
+    terms.push(x[0]);
+  }
 
-        switch (term) {
-            case "[#nome]":
-                if (user) {
-                    value = (user.name || '').split(' ')[0].trim();
-                }
-                break;
-        }
+  terms.forEach(function(term) {
+      var value;
 
-        if (value) {
-            text = text.replace(term, value);
-        }
-        else {
-            text = text.replace(regexRemoveTerm, '');
-        }
-    });
+      switch (term) {
+        case "[#nome]":
+          if (userId) {
+            request({
+              url: "https://graph.facebook.com/v2.6/" + userId + "?fields=first_name&access_token=" + token,
+              method: "GET"
+            }, function (error, response, body) {
+              if (error || response.body.error) {
+                return deferred.reject();
+              }
 
-    return text;
+              var user = JSON.parse(body);
+              if (user) {
+                value = (user.first_name || '').split(' ')[0].trim();
+              }
+
+              if (value) {
+                  text = text.replace(term, value);
+              }
+              else {
+                  text = text.replace(regexRemoveTerm, '');
+              }
+
+              deferred.resolve(text);
+            });
+          }
+          break;
+        default:
+          deferred.resolve(text);
+      }
+  });
+
+  return deferred.promise;
 }
