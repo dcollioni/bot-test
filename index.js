@@ -21,17 +21,7 @@ app.get('/webhook/', function (req, res) {
 	res.send('Error, wrong validation token');
 });
 
-function dispatch (sender, messages) {
-  console.log(messages);
-  if (!messages || messages.length == 0) {
-    return;
-  }
-  var msg = messages.shift();
-  console.log(msg);
-  messenger.sendTextMessage(sender, msg).then(function() {
-    dispatch(sender, messages);
-  });
-}
+
 
 app.post('/webhook/', function (req, res) {
   	messaging_events = req.body.entry[0].messaging;
@@ -70,14 +60,14 @@ app.post('/webhook/', function (req, res) {
               var msgs = JSON.parse(response.body);
               console.log(msgs);
 
+              var messagesToSend = [];
+
               var textMsgs = _.filter(msgs, function(m) { return m.type === 'text'; });
-              textMsgs = _.map(textMsgs, function(m) { return m.value });
-              dispatch(sender, textMsgs);
+              messagesToSend.push(textMsgs);
 
               var entityList = _.find(msgs, function(m) { return m.type === 'entity-list'; });
               if (entityList) {
                 var elements = _.map(entityList.value, function(entity) {
-                  console.log(entity);
                   return {
                     "title": entity.value.name,
                     "subtitle": entity.value.description,
@@ -93,11 +83,11 @@ app.post('/webhook/', function (req, res) {
                 });
 
                 if (elements.length > 0) {
-                  //setTimeout(function() {
-                    messenger.sendCardMessages(sender, elements);
-                  //}, textMsgs.length * 1000);
+                  var entities = { type: 'entities', value: elements };
+                  messagesToSend.push(entities);
                 }
               }
+              dispatch(sender, messagesToSend);
             }
           });
     	}
@@ -116,3 +106,60 @@ app.post('/webhook/', function (req, res) {
 app.listen(app.get('port'), function() {
 	console.log('Node app is running on port', app.get('port'));
 });
+
+function dispatch (sender, messages) {
+  if (!messages || messages.length == 0) {
+    return;
+  }
+  var msg = messages.shift();
+
+  switch (msg.type) {
+    case 'text':
+        var text = msg.value; // replaceMacros(user, msg.value);
+        messenger.sendTextMessage(sender, text).then(function() {
+          dispatch(sender, messages);
+        });
+      break;
+
+    case 'entities':
+        var elements = msg.value;
+        messenger.sendCardMessages(sender, elements).then(function() {
+          dispatch(sender, messages);
+        });
+      break;
+
+    default:
+      return;
+  }
+}
+
+function replaceMacros(user, text) {
+    var regex = /\[#[^\]]*\]/gi;
+    var regexRemoveTerm = /[,\s]+?\[#[^\]]*\]/gi;
+    var terms = [];
+    var x;
+
+    while ((x = regex.exec(text)) !== null)
+        terms.push(x[0]);
+
+    terms.forEach(function(term) {
+        var value;
+
+        switch (term) {
+            case "[#nome]":
+                if (user) {
+                    value = (user.name || '').split(' ')[0].trim();
+                }
+                break;
+        }
+
+        if (value) {
+            text = text.replace(term, value);
+        }
+        else {
+            text = text.replace(regexRemoveTerm, '');
+        }
+    });
+
+    return text;
+}

@@ -85,6 +85,8 @@ class Messenger {
   }
 
   sendCardMessages(sender, elements) {
+    var deferred = Promise.defer();
+
     var messageData = {
       "attachment": {
         "type": "template",
@@ -105,10 +107,14 @@ class Messenger {
     }, function(error, response, body) {
       if (error) {
         console.log('Error sending message: ', error);
+        return deferred.reject();
       } else if (response.body.error) {
         console.log('Error: ', response.body.error);
+        return deferred.reject();
       }
+      return deferred.resolve();
     });
+    return deferred.promise;
   }
 };
 
