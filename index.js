@@ -3,6 +3,7 @@ var bodyParser = require('body-parser');
 var messenger = require('./messenger.js');
 var request = require("request");
 var _ = require("underscore");
+var Promise = require("bluebird");
 var app = express();
 
 var token = "CAAHp6HIb7KwBAC0zjikZBaZBQ9XlctZCvbyxhpfms4fRwNw3BSLa5wpNyXubacndbZBW4wM8RuM6bQTCgtMHxs0sIvzFVhSlrVwgdkXvonDZC1Bh27EwSZBc7qeIE6HAvmqoiiKHk1wSYGNRoYipnzZBDChZCLDtDrk2GidihioWjFBKhe9BxLZAyoWpOGejrdXZCWU1aZBWNIZBEAZDZD";
@@ -75,7 +76,10 @@ app.post('/webhook/', function (req, res) {
                   messagesToSend.push(entitiesMsg);
                 }
               }
-              dispatch(sender, messagesToSend);
+
+              getUser(sender).then(function(user) {
+                dispatch(sender, messagesToSend, user);
+              });
             }
           });
     	}
@@ -95,7 +99,24 @@ app.listen(app.get('port'), function() {
 	console.log('Node app is running on port', app.get('port'));
 });
 
-function dispatch (sender, messages) {
+function getUser (userId) {
+  var deferred = Promise.defer();
+
+  request({
+    url: "https://graph.facebook.com/v2.6/" + userId + "?fields=first_name&access_token=" + token,
+    method: "GET"
+  }, function (error, response, body) {
+    if (error || response.body.error) {
+      return deferred.reject();
+    }
+    var user = JSON.parse(body);
+    deferred.resolve(user);
+  });
+
+  return deferred.promise;
+}
+
+function dispatch (sender, messages, user) {
   if (!messages || messages.length == 0) {
     return;
   }
@@ -103,11 +124,8 @@ function dispatch (sender, messages) {
   var msg = messages.shift();
   switch (msg.type) {
     case 'text':
-        var text = replaceMacros(sender, msg.value).then(function(newText) {
-          messenger.sendTextMessage(sender, newText).then(function() {
-            dispatch(sender, messages);
-          });
-        }).catch(function() {
+        var text = replaceMacros(user, msg.value);
+        messenger.sendTextMessage(sender, text).then(function() {
           dispatch(sender, messages);
         });
       break;
@@ -124,9 +142,7 @@ function dispatch (sender, messages) {
   }
 }
 
-function replaceMacros(userId, text) {
-  var deferred = Promise.defer();
-
+function replaceMacros(user, text) {
   var regex = /\[#[^\]]*\]/gi;
   var regexRemoveTerm = /[,\s]+?\[#[^\]]*\]/gi;
   var terms = [];
@@ -137,39 +153,22 @@ function replaceMacros(userId, text) {
   }
 
   terms.forEach(function(term) {
-      var value;
-
-      switch (term) {
+    var value;
+    switch (term) {
         case "[#nome]":
-          if (userId) {
-            request({
-              url: "https://graph.facebook.com/v2.6/" + userId + "?fields=first_name&access_token=" + token,
-              method: "GET"
-            }, function (error, response, body) {
-              if (error || response.body.error) {
-                return deferred.reject();
-              }
-
-              var user = JSON.parse(body);
-              if (user) {
+            if (user) {
                 value = (user.first_name || '').split(' ')[0].trim();
-              }
+            }
+            break;
+    }
 
-              if (value) {
-                  text = text.replace(term, value);
-              }
-              else {
-                  text = text.replace(regexRemoveTerm, '');
-              }
-
-              deferred.resolve(text);
-            });
-          }
-          break;
-        default:
-          deferred.resolve(text);
-      }
+    if (value) {
+        text = text.replace(term, value);
+    }
+    else {
+        text = text.replace(regexRemoveTerm, '');
+    }
   });
 
-  return deferred.promise;
+  return text;
 }
