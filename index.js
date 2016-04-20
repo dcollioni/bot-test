@@ -107,7 +107,7 @@ function dispatch (sender, messages) {
           messenger.sendTextMessage(sender, newText).then(function() {
             dispatch(sender, messages);
           });
-        }).fail(function() {
+        }).catch(function() {
           dispatch(sender, messages);
         });
       break;
