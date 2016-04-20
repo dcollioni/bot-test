@@ -22,9 +22,10 @@ app.get('/webhook/', function (req, res) {
 	res.send('Error, wrong validation token');
 });
 
-
-
 app.post('/webhook/', function (req, res) {
+
+  console.log(req.body);
+
   	messaging_events = req.body.entry[0].messaging;
   	for (i = 0; i < messaging_events.length; i++) {
     	event = req.body.entry[0].messaging[i];
