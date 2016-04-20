@@ -3,7 +3,7 @@
 var request = require("request");
 var Promise = require("bluebird");
 
-var token = "CAAHp6HIb7KwBAOEiAohWf0CCCNAcfEidBUdWs8sDBFWFHwrYBCQABP0JvZADFvw3ZBRpM3tLKPFF6YZAgHCqh3UDcE9XEcpztugHrotoNhBpdNABnNwkUedrZAa47RPelweTMDaa3kem7uG4xVZCZCFL1FsaGiyFg7eLFuCEuuIeGKaOMil4QJvrZANPM2B1RIOSvkkJMyVCwZDZD";
+var token = "CAAHp6HIb7KwBANkiB6Qkicu3ETD1htwW0HRf3LgbXYg8gsVj9DiPWRoeqZC9unJYzZCgBhow5kxXkRrZCdvwvba0ilSgTaav1aT6aZConK8nVo1hEKI46ZADcAqtDuaHfZA3BFqQjWmKGgbmVXAeMlDBWuA7kHKwgMoDGWN7GzXZCqYZAknZCdRiYjBXMNMvZBn2m6KXmM5yTJKAZDZD";
 
 class Messenger {
   sendTextMessage(sender, text) {
