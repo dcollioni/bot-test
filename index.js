@@ -60,10 +60,7 @@ app.post('/webhook/', function (req, res) {
               var msgs = JSON.parse(response.body);
               console.log(msgs);
 
-              var messagesToSend = [];
-
-              var textMsgs = _.filter(msgs, function(m) { return m.type === 'text'; });
-              messagesToSend.push(textMsgs);
+              var messagesToSend = _.filter(msgs, function(m) { return m.type === 'text'; });
 
               var entityList = _.find(msgs, function(m) { return m.type === 'entity-list'; });
               if (entityList) {
@@ -83,8 +80,8 @@ app.post('/webhook/', function (req, res) {
                 });
 
                 if (elements.length > 0) {
-                  var entities = { type: 'entities', value: elements };
-                  messagesToSend.push(entities);
+                  var entitiesMsg = { type: 'entities', value: elements };
+                  messagesToSend.push(entitiesMsg);
                 }
               }
               dispatch(sender, messagesToSend);
@@ -108,7 +105,6 @@ app.listen(app.get('port'), function() {
 });
 
 function dispatch (sender, messages) {
-  console.log('dispatch', messages);
   if (!messages || messages.length == 0) {
     return;
   }
