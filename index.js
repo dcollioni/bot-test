@@ -108,11 +108,12 @@ app.listen(app.get('port'), function() {
 });
 
 function dispatch (sender, messages) {
+  console.log('dispatch', messages);
   if (!messages || messages.length == 0) {
     return;
   }
-  var msg = messages.shift();
 
+  var msg = messages.shift();
   switch (msg.type) {
     case 'text':
         var text = msg.value; // replaceMacros(user, msg.value);
