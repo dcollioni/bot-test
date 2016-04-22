@@ -33,10 +33,10 @@ app.post('/webhook/', function (req, res) {
       		text = event.message.text;
           text = encodeURIComponent(text.trim());
 
-          userController.findOrCreate(sender).then(function(user) {
-          });
+          // userController.findOrCreate(sender).then(function(user) {
+          // });
 
-          return;
+          // return;
 
           request({
             url: "http://splchat-alpha.herokuapp.com/say/" + text,
