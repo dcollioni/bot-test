@@ -2,6 +2,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var messenger = require('./messenger.js');
 var userController = require('./controllers/user.js');
+var externalMessageController = require('./controllers/externalMessage.js');
 var request = require("request");
 var _ = require("underscore");
 var Promise = require("bluebird");
@@ -42,6 +43,8 @@ app.post('/webhook/', function (req, res) {
 
           userController.findOrCreate(sender, user).then(function(mongoUser) {
             console.log('mongo user', mongoUser);
+
+            externalMessageController.create(text, mongoUser);
 
             request({
               url: baseApiUrl + "/say/" + text,
