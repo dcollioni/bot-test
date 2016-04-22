@@ -36,7 +36,6 @@ app.post('/webhook/', function (req, res) {
 
       if (event.message && event.message.text) {
     		text = event.message.text;
-        text = encodeURIComponent(text.trim());
 
         userController.getFromFb(sender).then(function(user) {
           console.log('fb user', user);
@@ -46,6 +45,7 @@ app.post('/webhook/', function (req, res) {
 
             externalMessageController.create(text, mongoUser);
 
+            text = encodeURIComponent(text.trim());
             request({
               url: baseApiUrl + "/say/" + text,
               qs: { limit_results: 10, support_entity_list: true },
