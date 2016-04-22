@@ -97,11 +97,9 @@ app.post('/webhook/', function (req, res) {
                   if (elements.length > 0) {
                     var entitiesMsg = { type: 'entities', value: elements };
                     messagesToSend.push(entitiesMsg);
-                    externalMessageController.create(JSON.stringify(entitiesMsg), mongoUser);
 
-                    entities.forEach(function(entity) {
-                      externalDeliveryController.create(entity.value, mongoUser, text);
-                    });
+                    externalMessageController.create(JSON.stringify(entitiesMsg), mongoUser);
+                    externalDeliveryController.create(_.map(entities, function(e) { return e.value }), mongoUser, text);
                   }
                 }
 
