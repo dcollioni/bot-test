@@ -3,6 +3,7 @@ var bodyParser = require('body-parser');
 var messenger = require('./messenger.js');
 var userController = require('./controllers/user.js');
 var externalMessageController = require('./controllers/externalMessage.js');
+var externalDeliveryController = require('./controllers/externalDelivery.js');
 var request = require("request");
 var _ = require("underscore");
 var Promise = require("bluebird");
@@ -45,9 +46,9 @@ app.post('/webhook/', function (req, res) {
 
             externalMessageController.create(text, mongoUser);
 
-            text = encodeURIComponent(text.trim());
+            var query = encodeURIComponent(text.trim());
             request({
-              url: baseApiUrl + "/say/" + text,
+              url: baseApiUrl + "/say/" + query,
               qs: { limit_results: 10, support_entity_list: true },
               method: 'GET',
             }, function(error, response, body) {
@@ -96,6 +97,10 @@ app.post('/webhook/', function (req, res) {
                   if (elements.length > 0) {
                     var entitiesMsg = { type: 'entities', value: elements };
                     messagesToSend.push(entitiesMsg);
+
+                    entities.forEach(function(entity) {
+                      externalDeliveryController.create(entity, mongoUser, text);
+                    });
                   }
                 }
 
