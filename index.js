@@ -115,14 +115,13 @@ function getUser (userId) {
   var deferred = Promise.defer();
 
   request({
-    url: "https://graph.facebook.com/v2.6/" + userId + "?fields=first_name,email,language&access_token=" + token,
+    url: "https://graph.facebook.com/v2.6/" + userId + "?fields=first_name&access_token=" + token,
     method: "GET"
   }, function (error, response, body) {
     if (error || response.body.error) {
       return deferred.reject();
     }
     var user = JSON.parse(body);
-    console.log(user);
     deferred.resolve(user);
   });
 
