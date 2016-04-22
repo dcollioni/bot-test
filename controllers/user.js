@@ -20,6 +20,7 @@ class UserController {
       json: user
     }, function(error, response, body) {
       console.log('findOrCreate user:', body);
+      console.log('findOrCreate user:', response);
 
       if (error) {
         console.log('Error creating user: ', error);
