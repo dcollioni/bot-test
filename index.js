@@ -7,7 +7,7 @@ var _ = require("underscore");
 var Promise = require("bluebird");
 var app = express();
 
-var token = "CAAHp6HIb7KwBANkiB6Qkicu3ETD1htwW0HRf3LgbXYg8gsVj9DiPWRoeqZC9unJYzZCgBhow5kxXkRrZCdvwvba0ilSgTaav1aT6aZConK8nVo1hEKI46ZADcAqtDuaHfZA3BFqQjWmKGgbmVXAeMlDBWuA7kHKwgMoDGWN7GzXZCqYZAknZCdRiYjBXMNMvZBn2m6KXmM5yTJKAZDZD";
+var token = "CAAHp6HIb7KwBALm6gIKxdoxHiZBEMpUQWZCqn1iWi7WvaFtZCtzZCSpNl2I4xIfSjk0BcL9iz0dckX7XzPnz20fZAgAhRxRmpfgQG1rwvU3c4G0KtJ3aSaIwPDLwYbVcJT8GdtKqltmFemsrwY4hjXIYIlsaXK2GJPLwHZCgVWEfESUuLExhzGobrvCH9DVmuzCRIlGHZB4mgZDZD";
 
 app.use(bodyParser.json());
 app.set('port', (process.env.PORT || 5000));
