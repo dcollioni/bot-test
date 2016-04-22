@@ -99,7 +99,7 @@ app.post('/webhook/', function (req, res) {
                     messagesToSend.push(entitiesMsg);
 
                     entities.forEach(function(entity) {
-                      externalDeliveryController.create(entity, mongoUser, text);
+                      externalDeliveryController.create(entity.value, mongoUser, text);
                     });
                   }
                 }
