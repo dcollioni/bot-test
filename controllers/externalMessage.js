@@ -15,13 +15,16 @@ class ExternalMessageController {
 
     var message = {
       sender: {
-        id: user ? user._id : null,
         source: user ? user.source : "Messenger",
         external_id: user ? user.external_id : "bot"
       },
       text: text,
       created_at: new Date()
     };
+
+    if (user) {
+      message.sender.id = user._id;
+    }
 
     request({
       url: baseApiUrl + "/externalMessages/create",
