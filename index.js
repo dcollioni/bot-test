@@ -38,6 +38,8 @@ app.post('/webhook/', function (req, res) {
 
           // return;
 
+          console.log("text received:", text);
+
           request({
             url: "http://splchat-alpha.herokuapp.com/say/" + text,
             qs: { limit_results: 10, support_entity_list: true },
