@@ -15,9 +15,9 @@ class ExternalMessageController {
 
     var message = {
       sender: {
-        id: user._id,
-        source: user.source,
-        external_id: user.external_id
+        id: user ? user._id : null,
+        source: user ? user.source : "Messenger",
+        external_id: user ? user.external_id : "bot"
       },
       text: text,
       created_at: new Date()

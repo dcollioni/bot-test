@@ -66,6 +66,10 @@ app.post('/webhook/', function (req, res) {
 
                 var messagesToSend = _.filter(msgs, function(m) { return m.type === 'text'; });
 
+                messagesToSend.forEach(function(text) {
+                  externalMessageController.create(text);
+                });
+
                 var entities = _.filter(msgs, function(m) { return m.type === 'entity' });
                 var entityList = _.find(msgs, function(m) { return m.type === 'entity-list'; });
 
