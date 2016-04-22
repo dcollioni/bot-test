@@ -7,10 +7,14 @@ var _ = require("underscore");
 var Promise = require("bluebird");
 var app = express();
 
-var token = "CAAHp6HIb7KwBALm6gIKxdoxHiZBEMpUQWZCqn1iWi7WvaFtZCtzZCSpNl2I4xIfSjk0BcL9iz0dckX7XzPnz20fZAgAhRxRmpfgQG1rwvU3c4G0KtJ3aSaIwPDLwYbVcJT8GdtKqltmFemsrwY4hjXIYIlsaXK2GJPLwHZCgVWEfESUuLExhzGobrvCH9DVmuzCRIlGHZB4mgZDZD";
+var tokenTrid = "CAAHp6HIb7KwBALm6gIKxdoxHiZBEMpUQWZCqn1iWi7WvaFtZCtzZCSpNl2I4xIfSjk0BcL9iz0dckX7XzPnz20fZAgAhRxRmpfgQG1rwvU3c4G0KtJ3aSaIwPDLwYbVcJT8GdtKqltmFemsrwY4hjXIYIlsaXK2GJPLwHZCgVWEfESUuLExhzGobrvCH9DVmuzCRIlGHZB4mgZDZD";
+var tokenSplZak = "CAADH99bPVBUBABUOgWkZBuJivN4atcLc7yrGG5a8vHmvlyhRhDEch6PJH1xCzDIh08bSBIZCfqh1AeUvN2NbVbzkpZBCTLNAFY3xfvJEbe8LETcLs2H2bmgT3ECxbOm9ZCxe6IZADVEmmfSNNWYE4eGFlyfMfGzqpQ8b1ZB8U8HIcKe99LmPQbIfg3rdvv1r2RGqv9KjCH6gZDZD";
+var token = tokenTrid;
+
+var baseApiUrl = "http://splchat-alpha.herokuapp.com";
 
 app.use(bodyParser.json());
-app.set('port', (process.env.PORT || 5000));
+app.set('port', (process.env.PORT || 8002));
 
 app.get('/', function(request, response) {
 	response.send('Ok');
@@ -30,69 +34,69 @@ app.post('/webhook/', function (req, res) {
     	sender = event.sender.id;
 
       if (event.message && event.message.text) {
-      		text = event.message.text;
-          text = encodeURIComponent(text.trim());
+    		text = event.message.text;
+        text = encodeURIComponent(text.trim());
 
-          userController.findOrCreate(sender).then(function(user) {
+        userController.getFromFb(sender).then(function(user) {
+          console.log('fb user', user);
 
-          });
+          userController.findOrCreate(sender, user).then(function(mongoUser) {
+            console.log('mongo user', mongoUser);
 
-          console.log("text received:", text);
-
-          request({
-            url: "http://ec2-54-226-237-234.compute-1.amazonaws.com/say/" + text,
-            qs: { limit_results: 10, support_entity_list: true },
-            method: 'GET',
-          }, function(error, response, body) {
-            if (error) {
-              console.log('Error saying: ', error);
-              return;
-            }
-            else if (response.body.error) {
-              console.log('Error saying: ', response.body.error);
-              return;
-            }
-
-            if (response.body) {
-              var msgs = JSON.parse(response.body);
-              console.log(msgs);
-
-              var messagesToSend = _.filter(msgs, function(m) { return m.type === 'text'; });
-
-              var entities = _.filter(msgs, function(m) { return m.type === 'entity' });
-              var entityList = _.find(msgs, function(m) { return m.type === 'entity-list'; });
-
-              if (entityList) {
-                entities = _.union(entityList.value, entities);
+            request({
+              url: baseApiUrl + "/say/" + text,
+              qs: { limit_results: 10, support_entity_list: true },
+              method: 'GET',
+            }, function(error, response, body) {
+              if (error) {
+                console.log('Error saying: ', error);
+                return;
+              }
+              else if (response.body.error) {
+                console.log('Error saying: ', response.body.error);
+                return;
               }
 
-              if (entities.length > 0) {
-                var elements = _.map(entities, function(entity) {
-                  return {
-                    "title": entity.value.name,
-                    "subtitle": entity.value.description,
-                    "image_url": entity.value.arts ?
-                      entity.value.arts["2x1"] || entity.value.arts["2x2"]
-                      : null,
-                    "buttons": [{
-                      "type": "web_url",
-                      "url": "http://superplayer.fm/player?source=messenger&playing=" + entity.value.key,
-                      "title": "Ouvir"
-                    }]
-                  };
-                });
+              if (response.body) {
+                var msgs = JSON.parse(response.body);
+                console.log(msgs);
 
-                if (elements.length > 0) {
-                  var entitiesMsg = { type: 'entities', value: elements };
-                  messagesToSend.push(entitiesMsg);
+                var messagesToSend = _.filter(msgs, function(m) { return m.type === 'text'; });
+
+                var entities = _.filter(msgs, function(m) { return m.type === 'entity' });
+                var entityList = _.find(msgs, function(m) { return m.type === 'entity-list'; });
+
+                if (entityList) {
+                  entities = _.union(entityList.value, entities);
                 }
-              }
 
-              getUser(sender).then(function(user) {
+                if (entities.length > 0) {
+                  var elements = _.map(entities, function(entity) {
+                    return {
+                      "title": entity.value.name,
+                      "subtitle": entity.value.description,
+                      "image_url": entity.value.arts ?
+                        entity.value.arts["2x1"] || entity.value.arts["2x2"]
+                        : null,
+                      "buttons": [{
+                        "type": "web_url",
+                        "url": "http://superplayer.fm/player?source=messenger&playing=" + entity.value.key,
+                        "title": "Ouvir"
+                      }]
+                    };
+                  });
+
+                  if (elements.length > 0) {
+                    var entitiesMsg = { type: 'entities', value: elements };
+                    messagesToSend.push(entitiesMsg);
+                  }
+                }
+
                 dispatch(sender, messagesToSend, user);
-              });
-            }
+              }
+            });
           });
+        });
     	}
       else if (event.postback) {
         // var info = JSON.parse(event.postback.payload);
@@ -109,23 +113,6 @@ app.post('/webhook/', function (req, res) {
 app.listen(app.get('port'), function() {
 	console.log('Node app is running on port', app.get('port'));
 });
-
-function getUser (userId) {
-  var deferred = Promise.defer();
-
-  request({
-    url: "https://graph.facebook.com/v2.6/" + userId + "?fields=first_name&access_token=" + token,
-    method: "GET"
-  }, function (error, response, body) {
-    if (error || response.body.error) {
-      return deferred.reject();
-    }
-    var user = JSON.parse(body);
-    deferred.resolve(user);
-  });
-
-  return deferred.promise;
-}
 
 function dispatch (sender, messages, user) {
   if (!messages || messages.length == 0) {
