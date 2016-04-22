@@ -14,13 +14,16 @@ class UserController {
       source: "messenger"
     };
 
+    console.log('url', baseApiUrl + "/users/create");
+    console.log('json', user);
+
     request({
       url: baseApiUrl + "/users/create",
       method: 'POST',
       json: user
     }, function(error, response, body) {
-      console.log('findOrCreate user:', body);
-      console.log('findOrCreate user:', response);
+      console.log('findOrCreate error:', body);
+      console.log('findOrCreate body:', body);
 
       if (error) {
         console.log('Error creating user: ', error);
