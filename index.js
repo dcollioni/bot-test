@@ -41,7 +41,7 @@ app.post('/webhook/', function (req, res) {
           console.log("text received:", text);
 
           request({
-            url: "http://splchat-alpha.herokuapp.com/say/" + text,
+            url: "http://ec2-54-226-237-234.compute-1.amazonaws.com/say/" + text,
             qs: { limit_results: 10, support_entity_list: true },
             method: 'GET',
           }, function(error, response, body) {
