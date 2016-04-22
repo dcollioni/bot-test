@@ -1,6 +1,7 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var messenger = require('./messenger.js');
+var userController = require('./controllers/user.js');
 var request = require("request");
 var _ = require("underscore");
 var Promise = require("bluebird");
@@ -23,9 +24,6 @@ app.get('/webhook/', function (req, res) {
 });
 
 app.post('/webhook/', function (req, res) {
-
-  console.log(req.body);
-
   	messaging_events = req.body.entry[0].messaging;
   	for (i = 0; i < messaging_events.length; i++) {
     	event = req.body.entry[0].messaging[i];
@@ -34,6 +32,11 @@ app.post('/webhook/', function (req, res) {
       if (event.message && event.message.text) {
       		text = event.message.text;
           text = encodeURIComponent(text.trim());
+
+          userController.findOrCreate(sender).then(function(user) {
+          });
+
+          return;
 
           request({
             url: "http://splchat-alpha.herokuapp.com/say/" + text,
@@ -72,7 +75,7 @@ app.post('/webhook/', function (req, res) {
                       : null,
                     "buttons": [{
                       "type": "web_url",
-                      "url": "http://superplayer.fm/player?playing=" + entity.value.key,
+                      "url": "http://superplayer.fm/player?source=messenger&playing=" + entity.value.key,
                       "title": "Ouvir"
                     }]
                   };
