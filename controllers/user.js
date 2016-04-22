@@ -11,18 +11,15 @@ class UserController {
 
     var user = {
       external_id: senderId,
-      source: "messenger"
+      source: "Facebook",
+      created_at: new Date()
     };
-
-    console.log('url', baseApiUrl + "/users/create");
-    console.log('json', user);
 
     request({
       url: baseApiUrl + "/users/create",
       method: 'POST',
       json: user
     }, function(error, response, body) {
-      console.log('findOrCreate error:', body);
       console.log('findOrCreate body:', body);
 
       if (error) {

@@ -33,10 +33,9 @@ app.post('/webhook/', function (req, res) {
       		text = event.message.text;
           text = encodeURIComponent(text.trim());
 
-          // userController.findOrCreate(sender).then(function(user) {
-          // });
+          userController.findOrCreate(sender).then(function(user) {
 
-          // return;
+          });
 
           console.log("text received:", text);
 
