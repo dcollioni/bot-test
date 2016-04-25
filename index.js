@@ -9,6 +9,8 @@ var _ = require("underscore");
 var Promise = require("bluebird");
 var app = express();
 
+var defaultCardImage = "https://s3.amazonaws.com/sp.publicdocuments/images/bot-default.jpg";
+
 var tokenTrid = "CAAHp6HIb7KwBAJxahAYNoXuef5LvY4uMcBZCAtKArS9nTaRe8e5N9LmMDse8MBZC7JJEJoPNiZB24IoZBYFh7U63TeA17T2rHzLF41Baxv4eu7A0gs2zHnTuKL6ResLDzwx4CINvehEsPKl1YO7J0TqYoNiYclS2QkI7ufT2fZATwhxYhOrJYW98b41z97A6s0CsarsYNfgZDZD";
 var tokenSplZak = "CAADH99bPVBUBABUOgWkZBuJivN4atcLc7yrGG5a8vHmvlyhRhDEch6PJH1xCzDIh08bSBIZCfqh1AeUvN2NbVbzkpZBCTLNAFY3xfvJEbe8LETcLs2H2bmgT3ECxbOm9ZCxe6IZADVEmmfSNNWYE4eGFlyfMfGzqpQ8b1ZB8U8HIcKe99LmPQbIfg3rdvv1r2RGqv9KjCH6gZDZD";
 var token = tokenTrid;
@@ -40,6 +42,10 @@ app.post('/webhook/', function (req, res) {
 
         userController.getFromFb(sender).then(function(user) {
           console.log('fb user', user);
+
+          if (!user || user.error) {
+            continue;
+          }
 
           userController.findOrCreate(sender, user).then(function(mongoUser) {
             console.log('mongo user', mongoUser);
@@ -85,7 +91,7 @@ app.post('/webhook/', function (req, res) {
                       "subtitle": entity.value.description,
                       "image_url": entity.value.arts ?
                         entity.value.arts["2x1"] || entity.value.arts["2x2"]
-                        : "https://s3.amazonaws.com/sp.publicdocuments/images/bot-default.jpg",
+                        : defaultCardImage,
                       "buttons": [{
                         "type": "web_url",
                         "url": "http://superplayer.fm/player?source=messenger&playing=" + entity.value.key,
