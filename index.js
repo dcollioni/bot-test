@@ -112,7 +112,7 @@ function handle(inputs) {
             var entitiesMsg = { type: 'entities', value: elements };
             messagesToSend.push(entitiesMsg);
 
-            externalMessageController.create(JSON.stringify(entitiesMsg), mongoUser);
+            externalMessageController.create(JSON.stringify(entitiesMsg));
             externalDeliveryController.create(_.map(entities, function(e) { return e.value; }), mongoUser, text);
           }
         }
