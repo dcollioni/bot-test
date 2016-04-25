@@ -86,7 +86,12 @@ function handle(inputs) {
         });
 
         _.each(_.filter(msgs, function(m) { return m.type === 'question' }), function(m) {
-          messagesToSend.push(m.value);
+          if (m.value.type === 'text') {
+            messagesToSend.push({
+              type:  m.value.type,
+              value: m.value.text
+            });
+          }
         });
 
         messagesToSend.forEach(function(m) {
