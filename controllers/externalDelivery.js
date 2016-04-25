@@ -1,10 +1,9 @@
 "use strict";
 
-var request = require("request");
-var Promise = require("bluebird");
-var _ = require("underscore");
-
-var baseApiUrl = "http://splchat-alpha.herokuapp.com";
+var request = require("request"),
+    Promise = require("bluebird"),
+    _ = require("underscore"),
+    config = require('./../config/config.js');
 
 class ExternalDeliveryController {
   create(entities, user, searchTerm) {
@@ -29,7 +28,7 @@ class ExternalDeliveryController {
     };
 
     request({
-      url: baseApiUrl + "/externalDeliveries/create",
+      url: config.api.baseUrl + "/externalDeliveries/create",
       method: 'POST',
       json: delivery
     }, function(error, response, body) {

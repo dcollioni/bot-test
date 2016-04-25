@@ -1,9 +1,8 @@
 "use strict";
 
-var request = require("request");
-var Promise = require("bluebird");
-
-var baseApiUrl = "http://splchat-alpha.herokuapp.com";
+var request = require("request"),
+    Promise = require("bluebird"),
+    config = require('./../config/config.js');
 
 class ExternalMessageController {
   create(text, user) {
@@ -23,7 +22,7 @@ class ExternalMessageController {
     }
 
     request({
-      url: baseApiUrl + "/externalMessages/create",
+      url: config.api.baseUrl + "/externalMessages/create",
       method: 'POST',
       json: message
     }, function(error, response, body) {

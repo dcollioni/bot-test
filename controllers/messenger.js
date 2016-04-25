@@ -1,13 +1,10 @@
 "use strict";
 
-var request = require("request");
-var Promise = require("bluebird");
+var request = require("request"),
+    Promise = require("bluebird"),
+    config = require('./../config/config.js');
 
-var tokenTrid = "CAAHp6HIb7KwBAJxahAYNoXuef5LvY4uMcBZCAtKArS9nTaRe8e5N9LmMDse8MBZC7JJEJoPNiZB24IoZBYFh7U63TeA17T2rHzLF41Baxv4eu7A0gs2zHnTuKL6ResLDzwx4CINvehEsPKl1YO7J0TqYoNiYclS2QkI7ufT2fZATwhxYhOrJYW98b41z97A6s0CsarsYNfgZDZD";
-var tokenSplZak = "CAADH99bPVBUBABUOgWkZBuJivN4atcLc7yrGG5a8vHmvlyhRhDEch6PJH1xCzDIh08bSBIZCfqh1AeUvN2NbVbzkpZBCTLNAFY3xfvJEbe8LETcLs2H2bmgT3ECxbOm9ZCxe6IZADVEmmfSNNWYE4eGFlyfMfGzqpQ8b1ZB8U8HIcKe99LmPQbIfg3rdvv1r2RGqv9KjCH6gZDZD";
-var token = tokenTrid;
-
-class Messenger {
+class MessengerController {
   sendTextMessage(sender, text) {
     var deferred = Promise.defer();
 
@@ -15,8 +12,8 @@ class Messenger {
       text:text
     };
     request({
-      url: 'https://graph.facebook.com/v2.6/me/messages',
-      qs: { access_token: token },
+      url: config.messenger.graphUrl + '/me/messages',
+      qs: { access_token: config.messenger.token },
       method: 'POST',
       json: {
         recipient: {id:sender},
@@ -70,8 +67,8 @@ class Messenger {
       }
     };
     request({
-      url: 'https://graph.facebook.com/v2.6/me/messages',
-      qs: {access_token:token},
+      url: config.messenger.graphUrl + '/me/messages',
+      qs: { access_token: config.messenger.token },
       method: 'POST',
       json: {
         recipient: {id:sender},
@@ -99,8 +96,8 @@ class Messenger {
       }
     };
     request({
-      url: 'https://graph.facebook.com/v2.6/me/messages',
-      qs: {access_token:token},
+      url: config.messenger.graphUrl + '/me/messages',
+      qs: { access_token: config.messenger.token },
       method: 'POST',
       json: {
         recipient: {id:sender},
@@ -120,4 +117,4 @@ class Messenger {
   }
 };
 
-module.exports = new Messenger();
+module.exports = new MessengerController();
