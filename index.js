@@ -44,7 +44,7 @@ app.post('/webhook/', function (req, res) {
           console.log('fb user', user);
 
           if (!user || user.error) {
-            continue;
+            return;
           }
 
           userController.findOrCreate(sender, user).then(function(mongoUser) {
