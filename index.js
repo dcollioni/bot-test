@@ -79,7 +79,15 @@ function handle(inputs) {
       chatController.say(text).then(function(msgs) {
         msgs = JSON.parse(msgs);
         console.log(msgs);
-        var messagesToSend = _.filter(msgs, function(m) { return m.type === 'text'; });
+        var messagesToSend = [];
+
+        _.each(_.filter(msgs, function(m) { return m.type === 'text' }), function(m) {
+          messagesToSend.push(m);
+        });
+
+        _.each(_.filter(msgs, function(m) { return m.type === 'question' }), function(m) {
+          messagesToSend.push(m.value);
+        });
 
         messagesToSend.forEach(function(m) {
           externalMessageController.create(m.value);
