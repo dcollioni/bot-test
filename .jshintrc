@@ -1,0 +1,8 @@
+{
+    "browser": false,
+    "undef": true,
+    "unused": "vars",
+    "node": true,
+    "esversion": 6,
+    "laxbreak": true
+}

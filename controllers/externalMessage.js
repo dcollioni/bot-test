@@ -39,6 +39,6 @@ class ExternalMessageController {
 
     return deferred.promise;
   }
-};
+}
 
 module.exports = new ExternalMessageController();

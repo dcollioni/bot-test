@@ -115,6 +115,6 @@ class MessengerController {
     });
     return deferred.promise;
   }
-};
+}
 
 module.exports = new MessengerController();

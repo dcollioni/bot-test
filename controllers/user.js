@@ -5,15 +5,15 @@ var request = require("request"),
     config = require('./../config/config.js')();
 
 class UserController {
-  findOrCreate(userId, user) {
+  findOrCreate(userId, userFb) {
     var deferred = Promise.defer();
 
     var user = {
       external_id: userId,
       source: "Messenger",
       created_at: new Date(),
-      name: user ? user.first_name + ' ' + user.last_name : '',
-      picture: user ? user.profile_pic : ''
+      name: userFb ? userFb.first_name + ' ' + userFb.last_name : '',
+      picture: userFb ? userFb.profile_pic : ''
     };
 
     request({
@@ -51,6 +51,6 @@ class UserController {
 
     return deferred.promise;
   }
-};
+}
 
 module.exports = new UserController();

@@ -32,6 +32,6 @@ class ChatController {
 
     return deferred.promise;
   }
-};
+}
 
 module.exports = new ChatController();

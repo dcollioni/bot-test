@@ -6,14 +6,10 @@ var express = require('express'),
     externalMessageController = require('./controllers/externalMessage.js'),
     externalDeliveryController = require('./controllers/externalDelivery.js'),
     chatController = require('./controllers/chat.js'),
-    request = require("request"),
     _ = require("underscore"),
     app = express();
 
 app.use(bodyParser.json());
-
-console.log(config.app);
-
 app.set('port', config.app.port);
 
 app.get('/', function(request, response) {
@@ -28,81 +24,29 @@ app.get('/webhook/', function (req, res) {
 });
 
 app.post('/webhook/', function (req, res) {
-  	messaging_events = req.body.entry[0].messaging;
-  	for (i = 0; i < messaging_events.length; i++) {
-    	event = req.body.entry[0].messaging[i];
-    	sender = event.sender.id;
+	var messaging_events = req.body.entry[0].messaging;
+  var inputs = [];
+	for (var i = 0; i < messaging_events.length; i++) {
+  	var event = req.body.entry[0].messaging[i];
+  	var sender = event.sender.id;
 
-      if (event.message && event.message.text) {
-    		text = event.message.text;
-
-        userController.getFromFb(sender).then(function(user) {
-          console.log('fb user', user);
-
-          if (!user || user.error) {
-            return;
-          }
-
-          userController.findOrCreate(sender, user).then(function(mongoUser) {
-            console.log('mongo user', mongoUser);
-
-            externalMessageController.create(text, mongoUser);
-
-            chatController.say(text).then(function(msgs) {
-              msgs = JSON.parse(msgs);
-              console.log(msgs);
-              var messagesToSend = _.filter(msgs, function(m) { return m.type === 'text'; });
-
-              messagesToSend.forEach(function(m) {
-                externalMessageController.create(m.value);
-              });
-
-              var entities = _.filter(msgs, function(m) { return m.type === 'entity' });
-              var entityList = _.find(msgs, function(m) { return m.type === 'entity-list'; });
-
-              if (entityList) {
-                entities = _.union(entityList.value, entities);
-              }
-
-              if (entities.length > 0) {
-                var elements = _.map(entities, function(entity) {
-                  return {
-                    "title": entity.value.name,
-                    "subtitle": entity.value.description,
-                    "image_url": entity.value.arts ?
-                      entity.value.arts["2x1"] || entity.value.arts["2x2"]
-                      : config.s3.cardImage,
-                    "buttons": [{
-                      "type": "web_url",
-                      "url": "http://superplayer.fm/player?source=messenger&playing=" + entity.value.key,
-                      "title": "Ouvir"
-                    }]
-                  };
-                });
-
-                if (elements.length > 0) {
-                  var entitiesMsg = { type: 'entities', value: elements };
-                  messagesToSend.push(entitiesMsg);
-
-                  externalMessageController.create(JSON.stringify(entitiesMsg), mongoUser);
-                  externalDeliveryController.create(_.map(entities, function(e) { return e.value }), mongoUser, text);
-                }
-              }
-
-              dispatch(sender, messagesToSend, user);
-            });
-          });
-        });
-    	}
-      else if (event.postback) {
-        // var info = JSON.parse(event.postback.payload);
-        // console.log(info.type, info.key);
-
-        // text = JSON.stringify(event.postback);
-        // messenger.sendTextMessage(sender, "Postback received: "+text.substring(0, 200));
-        continue;
-      }
+    if (event.message && event.message.text) {
+      inputs.push({
+        sender: sender,
+        text: event.message.text
+      });
   	}
+    else if (event.postback) {
+      // var info = JSON.parse(event.postback.payload);
+      // console.log(info.type, info.key);
+      // text = JSON.stringify(event.postback);
+      // messenger.sendTextMessage(sender, "Postback received: "+text.substring(0, 200));
+      continue;
+    }
+	}
+
+  handle(inputs);
+
 	res.sendStatus(200);
 });
 
@@ -110,8 +54,78 @@ app.listen(app.get('port'), function() {
 	console.log('Node app is running on port', app.get('port'));
 });
 
+function handle(inputs) {
+  if (!inputs || inputs.length === 0) {
+    return;
+  }
+
+  var input = inputs.shift(),
+      sender = input.sender,
+      text = input.text;
+
+  userController.getFromFb(sender).then(function(user) {
+    console.log('fb user', user);
+
+    if (!user || user.error) {
+      handle(inputs);
+      return;
+    }
+
+    userController.findOrCreate(sender, user).then(function(mongoUser) {
+      console.log('mongo user', mongoUser);
+
+      externalMessageController.create(text, mongoUser);
+
+      chatController.say(text).then(function(msgs) {
+        msgs = JSON.parse(msgs);
+        console.log(msgs);
+        var messagesToSend = _.filter(msgs, function(m) { return m.type === 'text'; });
+
+        messagesToSend.forEach(function(m) {
+          externalMessageController.create(m.value);
+        });
+
+        var entities = _.filter(msgs, function(m) { return m.type === 'entity'; });
+        var entityList = _.find(msgs, function(m) { return m.type === 'entity-list'; });
+
+        if (entityList) {
+          entities = _.union(entityList.value, entities);
+        }
+
+        if (entities.length > 0) {
+          var elements = _.map(entities, function(entity) {
+            return {
+              "title": entity.value.name,
+              "subtitle": entity.value.description,
+              "image_url": entity.value.arts ?
+                entity.value.arts["2x1"] || entity.value.arts["2x2"]
+                : config.s3.cardImage,
+              "buttons": [{
+                "type": "web_url",
+                "url": "http://superplayer.fm/player?source=messenger&playing=" + entity.value.key,
+                "title": "Ouvir"
+              }]
+            };
+          });
+
+          if (elements.length > 0) {
+            var entitiesMsg = { type: 'entities', value: elements };
+            messagesToSend.push(entitiesMsg);
+
+            externalMessageController.create(JSON.stringify(entitiesMsg), mongoUser);
+            externalDeliveryController.create(_.map(entities, function(e) { return e.value; }), mongoUser, text);
+          }
+        }
+
+        dispatch(sender, messagesToSend, user);
+        handle(inputs);
+      });
+    });
+  });
+}
+
 function dispatch (sender, messages, user) {
-  if (!messages || messages.length == 0) {
+  if (!messages || messages.length === 0) {
     return;
   }
 

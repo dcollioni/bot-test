@@ -21,7 +21,7 @@ class ExternalDeliveryController {
           type: entity.type,
           key: entity.key,
           name: entity.name
-        }
+        };
       }),
       search_term: searchTerm,
       created_at: new Date()
@@ -45,6 +45,6 @@ class ExternalDeliveryController {
 
     return deferred.promise;
   }
-};
+}
 
 module.exports = new ExternalDeliveryController();
