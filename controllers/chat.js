@@ -27,6 +27,7 @@ class ChatController {
         console.log('Error saying: ', response.body.error);
         return deferred.reject();
       }
+      console.log(response.body);
       deferred.resolve(response.body);
     });
 
