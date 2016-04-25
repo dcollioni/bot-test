@@ -22,10 +22,12 @@ module.exports = function() {
         app.port = process.env.PORT || 8002;
     }
 
-    return {
+    var config = {
         messenger: messenger,
         api: api,
         app: app,
         s3: s3
     };
+
+    return config;
 };

@@ -3,7 +3,7 @@
 var request = require("request"),
     Promise = require("bluebird"),
     _ = require("underscore"),
-    config = require('./../config/config.js');
+    config = require('./../config/config.js')();
 
 class ExternalDeliveryController {
   create(entities, user, searchTerm) {

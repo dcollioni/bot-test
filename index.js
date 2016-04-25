@@ -1,6 +1,6 @@
 var express = require('express'),
     bodyParser = require('body-parser'),
-    config = require('./config/config.js'),
+    config = require('./config/config.js')(),
     messengerController = require('./controllers/messenger.js'),
     userController = require('./controllers/user.js'),
     externalMessageController = require('./controllers/externalMessage.js'),
@@ -11,7 +11,10 @@ var express = require('express'),
     app = express();
 
 app.use(bodyParser.json());
-app.set('port', 8002);
+
+console.log(config.app);
+
+app.set('port', config.app.port);
 
 app.get('/', function(request, response) {
 	response.send('Ok');
