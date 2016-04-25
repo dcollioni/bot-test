@@ -88,6 +88,8 @@ app.post('/webhook/', function (req, res) {
                 }
               }
 
+              console.log(messagesToSend);
+
               dispatch(sender, messagesToSend, user);
             });
           });
