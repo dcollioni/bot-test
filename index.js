@@ -49,6 +49,7 @@ app.post('/webhook/', function (req, res) {
             externalMessageController.create(text, mongoUser);
 
             chatController.say(text).then(function(msgs) {
+              msgs = JSON.parse(msgs);
               console.log(msgs);
               var messagesToSend = _.filter(msgs, function(m) { return m.type === 'text'; });
 
@@ -87,8 +88,6 @@ app.post('/webhook/', function (req, res) {
                   externalDeliveryController.create(_.map(entities, function(e) { return e.value }), mongoUser, text);
                 }
               }
-
-              console.log(messagesToSend);
 
               dispatch(sender, messagesToSend, user);
             });
